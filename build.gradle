@@ -1,7 +1,8 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '2.7.7'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'java'
+    id 'org.springframework.boot' version '2.7.7'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id "org.openapi.generator" version "6.2.1"
 }
 
 group = 'com.example'
@@ -9,14 +10,39 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    compileOnly 'io.swagger.core.v3:swagger-annotations:2.0.0-rc4'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
+
+task buildApiDoc(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "html2" //今回はhtml2を生成
+    inputSpec = "$rootDir/src/main/resources/api-schema.yaml".toString() //yamlファイルまでのpathに変更
+    additionalProperties = [
+            packageName: "petstore"
+    ]
+    outputDir = "$buildDir/apidoc".toString() //生成するhtmlファイルの出力場所
+}
+
+task buildSpringServer(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "spring"
+    inputSpec = "$rootDir/src/main/resources/api-schema.yaml".toString()
+    outputDir = "$buildDir/spring".toString()
+    apiPackage = "com.example.todoapi.controller"
+    modelPackage = "com.example.todoapi.model"
+    configOptions = [
+            interfaceOnly: "true"
+    ]
+}
+
+compileJava.dependsOn tasks.buildSpringServer
+sourceSets.main.java.srcDir "$buildDir/spring/src/main/java"
