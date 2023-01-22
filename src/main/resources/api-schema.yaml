@@ -148,7 +148,7 @@ components:
           type: integer
           format: int64
         size:
-          description: "リクエストされたlimit"
+          description: "取得できた件数"
           type: integer
           format: int32
       required:
