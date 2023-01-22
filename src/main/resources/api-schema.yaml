@@ -160,7 +160,7 @@ components:
       type: object
       properties:
         page:
-          $ref: "#components/schemas/PageDTO"
+          $ref: "#/components/schemas/PageDTO"
         results:
           type: array
           items: 
